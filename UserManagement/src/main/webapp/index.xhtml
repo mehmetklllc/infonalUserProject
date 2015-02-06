@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"   
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core">
+    <h:head>
+        <title>Kullanıcı İşlemleri</title>
+    </h:head>
+    <h:body style="background-color: tan">
+        <p:ajaxStatus  onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" />
+        <p:dialog widgetVar="statusDialog" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+            <p:graphicImage value="resources/images/loader.gif" />
+        </p:dialog>
+
+        <h:form id="rootForm" style="font-size: 12px; margin-top: 100px;">
+            <p:growl id="growl" showDetail="true" sticky="true"/>
+            <center>
+                <br/>
+                <h:panelGrid id="createPnlGrd" columns="11" >
+                    <h:outputText style="font-weight: bold;" value="Adı : "/>
+                    <p:inputText value="#{userBean.user.firstName}"/>    <br/> 
+                    <h:outputText style="font-weight: bold;" value="Soyadı : "/>
+                    <p:inputText value="#{userBean.user.lastName}"/>    <br/> 
+                    <h:outputText style="font-weight: bold;" value="Telefon : "/>
+                    <p:inputMask value="#{userBean.user.phoneNumber}" mask="(999) 999-9999"/> 
+                    <p:captcha  id="captc" label="Captcha" language="TR-tr" requiredMessage="Güvenlik kodu yanlış girildi!"/>
+                    <br/>
+                    <p:commandLink ajax="false"  value="Kaydet" actionListener="#{userBean.userCreate()}" update="growl :footForm:listUsers :rootForm:createPnlGrd :rootForm:captc @form"/>
+                </h:panelGrid>
+            </center>
+        </h:form>
+        <h:form id="footForm" style="font-size: 12px; margin-top: 100px;">
+            <p:growl id="growlFoot" showDetail="true" sticky="true"/>
+            <p:dataTable id="listUsers" rendered="#{userBean.userList.size()!= 0}" style="margin-top: 300px;font-size: 14px;" var="u" value="#{userBean.userList}">
+                <p:column style="width: 30px;" headerText="İşlemler">
+                    <p:commandLink title="Kullanıcı Sil"  onclick="deleteUser.show();" ajax="true"  actionListener="#{userBean.singleUser()}" update=":footForm:deleteUserPnl">
+                        <f:param name="userId" value="#{u.id}"/>
+                        <h:graphicImage value="resources/images/delete16.png"/>
+                    </p:commandLink>
+                    &nbsp;&nbsp;
+                    <p:commandLink title="Kullanıcı Düzenle"  onclick="updateUser.show();"  actionListener="#{userBean.singleUser()}" update=":footForm:updateUserPnl">
+                        <f:param name="userId" value="#{u.id}"/>
+                        <h:graphicImage value="resources/images/edit.jpg"/>
+                    </p:commandLink>
+                </p:column>
+
+                <p:column headerText="Adı">
+                    <h:outputText value="#{u.firstName}" />
+                </p:column>
+
+                <p:column headerText="Soyadı">
+                    <h:outputText value="#{u.lastName}" />
+                </p:column>
+
+                <p:column headerText="Telefon Numarası">
+                    <h:outputText value="#{u.phoneNumber}" />
+                </p:column>
+            </p:dataTable>
+
+
+
+            <p:dialog   id="updateUser" header="Kullanıcı Güncelleme" closable="true" modal="true" showEffect="clip" hideEffect="clip" resizable="false" width="300" height="150" widgetVar="updateUser" maximizable="100" minHeight="40">
+                <h:message for="name"/>
+                <p:panelGrid id="updateUserPnl" style="font-weight: bold;"  columns="2">
+
+                    Adı  
+                    <p:inputText id="name" value="#{userBean.resultUser.firstName}" />  
+                    Soyadı 
+                    <p:inputText value="#{userBean.resultUser.lastName}"/>   
+                    Telefon  
+                    <p:inputMask value="#{userBean.resultUser.phoneNumber}" mask="(999) 999-9999"/> 
+
+                    <br/>
+                    <p:commandButton style="margin-left: 94px;" ajax="true" onclick="updateUser.hide();" value="Güncelle" action="#{userBean.userUpdate()}" update=":footForm:listUsers"/>
+                </p:panelGrid>
+            </p:dialog>
+            <p:dialog   id="deleteUser" header="Kullanıcı Silme" closable="false" modal="true" showEffect="clip" hideEffect="clip" resizable="false" width="300" height="150" widgetVar="deleteUser" maximizable="100" minHeight="40">
+                <center>
+                    <h:outputText style="font-weight: bold;" value="Silmek istediğinize eminmisiniz?"/>
+                    <br/>
+                    <br/>
+                    <p:panelGrid id="deleteUserPnl" style="font-weight: bold;"  columns="2">
+                        Adı 
+                        <h:outputText value="#{userBean.resultUser.firstName}" />  
+                        Soyadı 
+                        <h:outputText value="#{userBean.resultUser.lastName}"/>   
+                        Telefon  
+                        <h:outputText  value="#{userBean.resultUser.phoneNumber}"/>
+
+                    </p:panelGrid>
+                </center> 
+                <br/>
+                <p:commandButton style="width: 90px; margin-left: 40px;"  ajax="true" onclick="deleteUser.hide();" value="Evet" actionListener="#{userBean.userDelete()}" update="growlFoot :footForm:listUsers"/>
+                <p:commandButton style="width: 90px;"  ajax="true" onclick="deleteUser.hide();" value="Hayır" />
+            </p:dialog>
+        </h:form>
+    </h:body>
+</html>
+
