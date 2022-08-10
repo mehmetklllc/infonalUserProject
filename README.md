@@ -1,4 +1,3 @@
-Author       : Mehmet KILIÇ
 Project Name : UserManagement
 Version      : 1.0
 
